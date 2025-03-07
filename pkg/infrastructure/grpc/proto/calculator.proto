@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package calculator;
+
+option go_package = "github.com/cfioretti/calculator/pkg/infrastructure/grpc/proto";
+
+service DoughCalculator {
+  rpc TotalDoughWeightByPans(PansRequest) returns (PansResponse) {}
+}
+
+message MeasuresProto {
+  optional int32 diameter = 1;
+  optional int32 edge = 2;
+  optional int32 width = 3;
+  optional int32 length = 4;
+}
+
+message PanProto {
+  string shape = 1;
+  MeasuresProto measures = 2;
+  string name = 3;
+  double area = 4;
+}
+
+message PansProto {
+  repeated PanProto pans = 1;
+  double totalArea = 2;
+}
+
+message PansRequest {
+  PansProto pans = 1;
+}
+
+message PansResponse {
+  PansProto pans = 1;
+}
