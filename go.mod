@@ -3,6 +3,8 @@ module github.com/cfioretti/calculator
 go 1.24
 
 require (
+	github.com/google/uuid v1.6.0
+	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/grpc v1.67.3
 	google.golang.org/protobuf v1.36.5
