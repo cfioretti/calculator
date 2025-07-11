@@ -7,12 +7,15 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
 const (
 	CorrelationIDKey = "correlation_id"
+	TraceIDKey       = "trace_id"
+	SpanIDKey        = "span_id"
 	ServiceNameKey   = "service_name"
 	VersionKey       = "version"
 
@@ -72,6 +75,16 @@ func (l *Logger) WithContext(ctx context.Context) *logrus.Entry {
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		if correlationIDs := md.Get(CorrelationIDMetadataKey); len(correlationIDs) > 0 {
 			entry = entry.WithField(CorrelationIDKey, correlationIDs[0])
+		}
+	}
+
+	if span := trace.SpanFromContext(ctx); span != nil {
+		spanCtx := span.SpanContext()
+		if spanCtx.HasTraceID() {
+			entry = entry.WithField(TraceIDKey, spanCtx.TraceID().String())
+		}
+		if spanCtx.HasSpanID() {
+			entry = entry.WithField(SpanIDKey, spanCtx.SpanID().String())
 		}
 	}
 
