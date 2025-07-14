@@ -126,7 +126,6 @@ linters:
     - nestif
     - godox
     - testpackage
-    - gochecknoglobals
     - prealloc
 
   disable:
