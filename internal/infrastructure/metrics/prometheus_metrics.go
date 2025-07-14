@@ -31,16 +31,21 @@ type PrometheusMetrics struct {
 }
 
 func NewPrometheusMetrics() *PrometheusMetrics {
+	return NewPrometheusMetricsWithRegistry(prometheus.DefaultRegisterer)
+}
+
+func NewPrometheusMetricsWithRegistry(reg prometheus.Registerer) *PrometheusMetrics {
+	factory := promauto.With(reg)
 	return &PrometheusMetrics{
 		// Business Operations
-		calculationsTotal: promauto.NewCounterVec(
+		calculationsTotal: factory.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "calculator_calculations_total",
 				Help: "Total number of calculations performed",
 			},
 			[]string{"type"},
 		),
-		calculationDuration: promauto.NewHistogramVec(
+		calculationDuration: factory.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name:    "calculator_calculation_duration_seconds",
 				Help:    "Duration of calculations in seconds",
@@ -48,13 +53,13 @@ func NewPrometheusMetrics() *PrometheusMetrics {
 			},
 			[]string{"type"},
 		),
-		activeCalculations: promauto.NewGauge(
+		activeCalculations: factory.NewGauge(
 			prometheus.GaugeOpts{
 				Name: "calculator_active_calculations",
 				Help: "Number of calculations currently in progress",
 			},
 		),
-		calculationErrors: promauto.NewCounterVec(
+		calculationErrors: factory.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "calculator_calculation_errors_total",
 				Help: "Total number of calculation errors",
@@ -63,14 +68,14 @@ func NewPrometheusMetrics() *PrometheusMetrics {
 		),
 
 		// Quality Metrics
-		doughAccuracy: promauto.NewHistogram(
+		doughAccuracy: factory.NewHistogram(
 			prometheus.HistogramOpts{
 				Name:    "calculator_dough_accuracy_percentage",
 				Help:    "Accuracy of dough calculations as percentage",
 				Buckets: []float64{70, 75, 80, 85, 90, 95, 97, 99, 99.5, 100},
 			},
 		),
-		ingredientValidations: promauto.NewCounterVec(
+		ingredientValidations: factory.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "calculator_ingredient_validations_total",
 				Help: "Total number of ingredient validations",
@@ -79,21 +84,21 @@ func NewPrometheusMetrics() *PrometheusMetrics {
 		),
 
 		// Domain-specific metrics
-		doughWeight: promauto.NewHistogram(
+		doughWeight: factory.NewHistogram(
 			prometheus.HistogramOpts{
 				Name:    "calculator_dough_weight_grams",
 				Help:    "Weight of calculated dough in grams",
 				Buckets: []float64{100, 250, 500, 750, 1000, 1500, 2000, 3000, 5000, 10000},
 			},
 		),
-		doughHydration: promauto.NewHistogram(
+		doughHydration: factory.NewHistogram(
 			prometheus.HistogramOpts{
 				Name:    "calculator_dough_hydration_percentage",
 				Help:    "Hydration percentage of calculated dough",
 				Buckets: []float64{50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100},
 			},
 		),
-		recipeTypes: promauto.NewCounterVec(
+		recipeTypes: factory.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "calculator_recipe_types_total",
 				Help: "Total number of calculations by recipe type",
@@ -102,14 +107,14 @@ func NewPrometheusMetrics() *PrometheusMetrics {
 		),
 
 		// Technical metrics
-		grpcRequestsTotal: promauto.NewCounterVec(
+		grpcRequestsTotal: factory.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "calculator_grpc_requests_total",
 				Help: "Total number of gRPC requests",
 			},
 			[]string{"method", "status"},
 		),
-		grpcRequestDuration: promauto.NewHistogramVec(
+		grpcRequestDuration: factory.NewHistogramVec(
 			prometheus.HistogramOpts{
 				Name:    "calculator_grpc_request_duration_seconds",
 				Help:    "Duration of gRPC requests in seconds",

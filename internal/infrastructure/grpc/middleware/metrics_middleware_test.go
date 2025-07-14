@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	infraMetrics "github.com/cfioretti/calculator/internal/infrastructure/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // MockDomainMetrics for testing domain metrics interface
@@ -351,7 +352,8 @@ func TestGetErrorType(t *testing.T) {
 func TestMetricsMiddleware_UnaryServerInterceptor_Success(t *testing.T) {
 	// Arrange
 	mockDomainMetrics := NewMockDomainMetrics()
-	prometheusMetrics := infraMetrics.NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	prometheusMetrics := infraMetrics.NewPrometheusMetricsWithRegistry(registry)
 
 	middleware := NewMetricsMiddleware(mockDomainMetrics, prometheusMetrics)
 
@@ -394,7 +396,8 @@ func TestMetricsMiddleware_UnaryServerInterceptor_Success(t *testing.T) {
 func TestMetricsMiddleware_UnaryServerInterceptor_Error(t *testing.T) {
 	// Arrange
 	mockDomainMetrics := NewMockDomainMetrics()
-	prometheusMetrics := infraMetrics.NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	prometheusMetrics := infraMetrics.NewPrometheusMetricsWithRegistry(registry)
 
 	middleware := NewMetricsMiddleware(mockDomainMetrics, prometheusMetrics)
 	interceptor := middleware.UnaryServerInterceptor()
@@ -437,7 +440,8 @@ func TestMetricsMiddleware_UnaryServerInterceptor_Error(t *testing.T) {
 func TestMetricsMiddleware_UnaryServerInterceptor_NonCalculationMethod(t *testing.T) {
 	// Arrange
 	mockDomainMetrics := NewMockDomainMetrics()
-	prometheusMetrics := infraMetrics.NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	prometheusMetrics := infraMetrics.NewPrometheusMetricsWithRegistry(registry)
 
 	middleware := NewMetricsMiddleware(mockDomainMetrics, prometheusMetrics)
 	interceptor := middleware.UnaryServerInterceptor()

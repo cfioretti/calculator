@@ -10,7 +10,8 @@ import (
 )
 
 func TestPrometheusMetrics_IncrementCalculationsTotal(t *testing.T) {
-	metrics := NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	metrics := NewPrometheusMetricsWithRegistry(registry)
 
 	metrics.IncrementCalculationsTotal("dough_calculation")
 	metrics.IncrementCalculationsTotal("dough_calculation")
@@ -24,7 +25,7 @@ func TestPrometheusMetrics_IncrementCalculationsTotal(t *testing.T) {
 	`
 
 	if err := testutil.GatherAndCompare(
-		prometheus.DefaultGatherer,
+		registry,
 		strings.NewReader(expected),
 		"calculator_calculations_total",
 	); err != nil {
@@ -33,12 +34,13 @@ func TestPrometheusMetrics_IncrementCalculationsTotal(t *testing.T) {
 }
 
 func TestPrometheusMetrics_RecordCalculationDuration(t *testing.T) {
-	metrics := NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	metrics := NewPrometheusMetricsWithRegistry(registry)
 
 	metrics.RecordCalculationDuration("dough_calculation", 100*time.Millisecond)
 	metrics.RecordCalculationDuration("dough_calculation", 200*time.Millisecond)
 
-	metricFamily, err := prometheus.DefaultGatherer.Gather()
+	metricFamily, err := registry.Gather()
 	if err != nil {
 		t.Fatalf("Failed to gather metrics: %v", err)
 	}
@@ -71,7 +73,8 @@ func TestPrometheusMetrics_RecordCalculationDuration(t *testing.T) {
 }
 
 func TestPrometheusMetrics_SetActiveCalculations(t *testing.T) {
-	metrics := NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	metrics := NewPrometheusMetricsWithRegistry(registry)
 
 	metrics.SetActiveCalculations(5)
 
@@ -82,7 +85,7 @@ func TestPrometheusMetrics_SetActiveCalculations(t *testing.T) {
 	`
 
 	if err := testutil.GatherAndCompare(
-		prometheus.DefaultGatherer,
+		registry,
 		strings.NewReader(expected),
 		"calculator_active_calculations",
 	); err != nil {
@@ -98,7 +101,7 @@ func TestPrometheusMetrics_SetActiveCalculations(t *testing.T) {
 	`
 
 	if err := testutil.GatherAndCompare(
-		prometheus.DefaultGatherer,
+		registry,
 		strings.NewReader(expected),
 		"calculator_active_calculations",
 	); err != nil {
@@ -107,7 +110,8 @@ func TestPrometheusMetrics_SetActiveCalculations(t *testing.T) {
 }
 
 func TestPrometheusMetrics_IncrementCalculationErrors(t *testing.T) {
-	metrics := NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	metrics := NewPrometheusMetricsWithRegistry(registry)
 
 	metrics.IncrementCalculationErrors("dough_calculation", "invalid_input")
 	metrics.IncrementCalculationErrors("dough_calculation", "invalid_input")
@@ -123,7 +127,7 @@ func TestPrometheusMetrics_IncrementCalculationErrors(t *testing.T) {
 	`
 
 	if err := testutil.GatherAndCompare(
-		prometheus.DefaultGatherer,
+		registry,
 		strings.NewReader(expected),
 		"calculator_calculation_errors_total",
 	); err != nil {
@@ -132,13 +136,14 @@ func TestPrometheusMetrics_IncrementCalculationErrors(t *testing.T) {
 }
 
 func TestPrometheusMetrics_RecordDoughAccuracy(t *testing.T) {
-	metrics := NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	metrics := NewPrometheusMetricsWithRegistry(registry)
 
 	metrics.RecordDoughAccuracy(95.5)
 	metrics.RecordDoughAccuracy(98.2)
 	metrics.RecordDoughAccuracy(92.1)
 
-	metricFamily, err := prometheus.DefaultGatherer.Gather()
+	metricFamily, err := registry.Gather()
 	if err != nil {
 		t.Fatalf("Failed to gather metrics: %v", err)
 	}
@@ -169,7 +174,8 @@ func TestPrometheusMetrics_RecordDoughAccuracy(t *testing.T) {
 }
 
 func TestPrometheusMetrics_IncrementIngredientValidations(t *testing.T) {
-	metrics := NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	metrics := NewPrometheusMetricsWithRegistry(registry)
 
 	metrics.IncrementIngredientValidations("flour", true)
 	metrics.IncrementIngredientValidations("flour", true)
@@ -187,7 +193,7 @@ func TestPrometheusMetrics_IncrementIngredientValidations(t *testing.T) {
 	`
 
 	if err := testutil.GatherAndCompare(
-		prometheus.DefaultGatherer,
+		registry,
 		strings.NewReader(expected),
 		"calculator_ingredient_validations_total",
 	); err != nil {
@@ -196,13 +202,14 @@ func TestPrometheusMetrics_IncrementIngredientValidations(t *testing.T) {
 }
 
 func TestPrometheusMetrics_RecordDoughWeight(t *testing.T) {
-	metrics := NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	metrics := NewPrometheusMetricsWithRegistry(registry)
 
 	metrics.RecordDoughWeight(500.0)
 	metrics.RecordDoughWeight(750.0)
 	metrics.RecordDoughWeight(1000.0)
 
-	metricFamily, err := prometheus.DefaultGatherer.Gather()
+	metricFamily, err := registry.Gather()
 	if err != nil {
 		t.Fatalf("Failed to gather metrics: %v", err)
 	}
@@ -233,7 +240,8 @@ func TestPrometheusMetrics_RecordDoughWeight(t *testing.T) {
 }
 
 func TestPrometheusMetrics_IncrementRecipeTypes(t *testing.T) {
-	metrics := NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	metrics := NewPrometheusMetricsWithRegistry(registry)
 
 	metrics.IncrementRecipeTypes("sourdough")
 	metrics.IncrementRecipeTypes("sourdough")
@@ -250,7 +258,7 @@ func TestPrometheusMetrics_IncrementRecipeTypes(t *testing.T) {
 	`
 
 	if err := testutil.GatherAndCompare(
-		prometheus.DefaultGatherer,
+		registry,
 		strings.NewReader(expected),
 		"calculator_recipe_types_total",
 	); err != nil {
@@ -259,7 +267,8 @@ func TestPrometheusMetrics_IncrementRecipeTypes(t *testing.T) {
 }
 
 func TestPrometheusMetrics_GRPCMetrics(t *testing.T) {
-	metrics := NewPrometheusMetrics()
+	registry := prometheus.NewRegistry()
+	metrics := NewPrometheusMetricsWithRegistry(registry)
 
 	metrics.IncrementGRPCRequests("CalculateDough", "success")
 	metrics.IncrementGRPCRequests("CalculateDough", "success")
@@ -278,14 +287,14 @@ func TestPrometheusMetrics_GRPCMetrics(t *testing.T) {
 	`
 
 	if err := testutil.GatherAndCompare(
-		prometheus.DefaultGatherer,
+		registry,
 		strings.NewReader(expected),
 		"calculator_grpc_requests_total",
 	); err != nil {
 		t.Errorf("Unexpected gRPC requests metric: %v", err)
 	}
 
-	metricFamily, err := prometheus.DefaultGatherer.Gather()
+	metricFamily, err := registry.Gather()
 	if err != nil {
 		t.Fatalf("Failed to gather metrics: %v", err)
 	}
