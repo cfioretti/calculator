@@ -3,17 +3,20 @@ package grpc
 import (
 	"context"
 
-	"github.com/cfioretti/calculator/pkg/application"
 	"github.com/cfioretti/calculator/pkg/domain"
 	pb "github.com/cfioretti/calculator/pkg/infrastructure/grpc/proto/generated"
 )
 
-type Server struct {
-	pb.UnimplementedDoughCalculatorServer
-	calculatorService *application.DoughCalculatorService
+type CalculatorService interface {
+	TotalDoughWeightByPans(context.Context, domain.Pans) (*domain.Pans, error)
 }
 
-func NewServer(calculatorService *application.DoughCalculatorService) *Server {
+type Server struct {
+	pb.UnimplementedDoughCalculatorServer
+	calculatorService CalculatorService
+}
+
+func NewServer(calculatorService CalculatorService) *Server {
 	return &Server{
 		calculatorService: calculatorService,
 	}
@@ -22,7 +25,7 @@ func NewServer(calculatorService *application.DoughCalculatorService) *Server {
 func (s *Server) TotalDoughWeightByPans(ctx context.Context, req *pb.PansRequest) (*pb.PansResponse, error) {
 	domainPans := toDomainPans(req.Pans)
 
-	result, err := s.calculatorService.TotalDoughWeightByPans(domainPans)
+	result, err := s.calculatorService.TotalDoughWeightByPans(ctx, domainPans)
 	if err != nil {
 		return nil, err
 	}

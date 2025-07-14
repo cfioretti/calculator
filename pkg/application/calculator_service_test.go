@@ -1,6 +1,7 @@
 package application
 
 import (
+	"context"
 	"math"
 	"testing"
 
@@ -96,7 +97,8 @@ func TestTotalDoughWeightByPans(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := calculator.TotalDoughWeightByPans(tt.input)
+			ctx := context.Background()
+			result, err := calculator.TotalDoughWeightByPans(ctx, tt.input)
 
 			if tt.wantErr {
 				assert.Error(t, err)

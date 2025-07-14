@@ -1,6 +1,7 @@
 package application
 
 import (
+	"context"
 	"errors"
 
 	"github.com/cfioretti/calculator/internal/domain/strategies"
@@ -22,7 +23,7 @@ type PanInput struct {
 	Measures map[string]interface{} `json:"measures"`
 }
 
-func (dc DoughCalculatorService) TotalDoughWeightByPans(body domain.Pans) (*domain.Pans, error) {
+func (dc DoughCalculatorService) TotalDoughWeightByPans(ctx context.Context, body domain.Pans) (*domain.Pans, error) {
 	var result domain.Pans
 	for _, item := range body.Pans {
 		strategy, err := strategies.GetStrategy(item.Shape)
