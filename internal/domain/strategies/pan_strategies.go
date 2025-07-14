@@ -3,8 +3,9 @@ package strategies
 import (
 	"errors"
 	"fmt"
-	"github.com/cfioretti/calculator/pkg/domain"
 	"math"
+
+	"github.com/cfioretti/calculator/pkg/domain"
 )
 
 type PanStrategy interface {
